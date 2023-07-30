@@ -46,7 +46,7 @@ jobs:
 
       - name: Build arm64
 
-        run: CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -o ./output/fulltclash-linux-arm64 fulltclash.go
+        run: CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -tags with_gvisor -ldflags="-s -w" -o ./output/fulltclash-meta-linux-arm64 fulltclash.go
 
       - name: Upload  Asset 
 
@@ -75,14 +75,14 @@ jobs:
       - name: go-mod
         run: go mod tidy
       - name: Build
-        run: go build -ldflags="-s -w" -o ./output/fulltclash-${{ matrix.os }}-amd64 fulltclash.go
+        run: go build -tags with_gvisor -ldflags="-s -w" -o ./output/fulltclash-meta-${{ matrix.os }}-amd64 fulltclash.go
       - name: edit name
         if: runner.os == 'Windows'
         run: mv ./output/fulltclash-windows-latest-amd64 ./output/fulltclash-windows-amd64.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: fulltclash-${{ matrix.os }}-amd64
+          name: fulltclash-meta-${{ matrix.os }}-amd64
           path: ./output/*
           if-no-files-found: error
    
