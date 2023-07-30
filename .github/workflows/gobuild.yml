@@ -5,11 +5,60 @@ name: Go
 
 on:
   push:
-    branches: ["meta"]
-    paths-ignore:
-      - "build.key"
-      - "README.md"
+    branches: [ "meta" ]
 jobs:
+  arm64:
+
+    name: build arm64core version
+
+
+    runs-on: ubuntu-latest
+
+    container: docker.io/ubuntu:18.04
+
+    steps:
+
+      - name: build linux arm64 version
+
+        run: |
+
+          apt-get update
+
+          apt install -y sudo curl wget unzip ca-certificates build-essential gcc-aarch64-linux-gnu git
+
+          update-ca-certificates
+
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+
+        uses: actions/setup-go@v4
+
+        with:
+
+          go-version: stable
+
+
+
+      - name: gomod
+
+        run: go mod tidy
+
+      - name: Build arm64
+
+        run: CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -o ./output/fulltclash-linux-arm64 fulltclash.go
+
+      - name: Upload  Asset 
+
+        uses: actions/upload-artifact@v2
+
+        with:
+
+          name: fulltclash-arm64
+
+          path: ./output/*
+
+          if-no-files-found: error
   build:
     name: Build
     runs-on: ${{ matrix.os }}
@@ -26,13 +75,14 @@ jobs:
       - name: go-mod
         run: go mod tidy
       - name: Build
-        run: go build -tags with_gvisor -ldflags="-s -w" -o ./output/fulltclash-meta-${{ matrix.os }}-amd64 fulltclash.go
+        run: go build -ldflags="-s -w" -o ./output/fulltclash-${{ matrix.os }}-amd64 fulltclash.go
       - name: edit name
         if: runner.os == 'Windows'
-        run: mv ./output/fulltclash-meta-windows-latest-amd64 ./output/fulltclash-meta-windows-amd64.exe
+        run: mv ./output/fulltclash-windows-latest-amd64 ./output/fulltclash-windows-amd64.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: fulltclash-meta-${{ matrix.os }}-amd64
+          name: fulltclash-${{ matrix.os }}-amd64
           path: ./output/*
           if-no-files-found: error
+   
