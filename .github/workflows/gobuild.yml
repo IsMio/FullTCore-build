@@ -78,7 +78,7 @@ jobs:
         run: go build -tags with_gvisor -ldflags="-s -w" -o ./output/fulltclash-meta-${{ matrix.os }}-amd64 fulltclash.go
       - name: edit name
         if: runner.os == 'Windows'
-        run: mv ./output/fulltclash-windows-latest-amd64 ./output/fulltclash-windows-amd64.exe
+        run: mv ./output/fulltclash-meta-windows-latest-amd64 ./output/fulltclash-meta-windows-amd64.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
